@@ -17,7 +17,7 @@ void sendTeperatureTS(float* temps, int count){
         client.print("POST /update HTTP/1.1\n");
         client.print("Host: api.thingspeak.com\n");
         client.print("Connection: close\n");
-        client.print("X-THINGSPEAKAPIKEY: " + API_KEY + "\n");
+        client.print("X-THINGSPEAKAPIKEY: " + String(API_KEY) + "\n");
         client.print("Content-Type: application/x-www-form-urlencoded\n");
         client.print("Content-Length: ");
         client.print(postStr.length());
@@ -120,7 +120,7 @@ bool THDevice::IsError() {
     Serial.print("Pump temp: ");
     Serial.println(tempService.GetPumpTemp());
 
-    if(tempService.GetPumpTemp() > 80 || tempService.GetOutTemp() < -6) {
+    if(tempService.GetPumpTemp() > 80 || tempService.GetOutTemp() < -8) {
         return true;
     }
     return false;
@@ -148,7 +148,8 @@ void THDevice::Heat() {
         return;
     }
 
-    SetState(TH_STATE_PAUSE);
+    nextState = TH_STATE_PAUSE;
+    stateTime = 10 * SECONDS;
 }
 
 void THDevice::Defrost() {
