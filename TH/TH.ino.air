@@ -1,0 +1,324 @@
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include "/var/conf/TH_conf/conf.h"
+
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature DS18B20(&oneWire);
+
+#define MINUTES (60 * 1000)
+#define SECONDS 60
+
+#define TH_STATE_NONE 0
+#define TH_STATE_START 1
+#define TH_STATE_HEAT 2
+#define TH_STATE_PAUSE 3
+#define TH_STATE_DEFROST 4
+#define TH_STATE_DEFROST_COOL 5
+#define TH_STATE_DEFROST_PAUSE 6
+#define TH_STATE_ERROR 7
+
+void sendTeperatureTS(float* temps, int count){  
+//    WiFiClient client;
+//  
+//    if (client.connect(server, 80)) { // use ip 184.106.153.149 or api.thingspeak.com
+//        Serial.println("WiFi Client connected ");
+//
+//        String postStr = apiKey;
+//        for(int i=0;i<count;i++) {
+//            if(temps[i] > 120 || temps[i] < -80) {
+//                continue;
+//            }
+//            postStr += "&field" + String(i+1)+"=";
+//            postStr += String(temps[i]);
+//        }
+//
+//        client.print("POST /update HTTP/1.1\n");
+//        client.print("Host: api.thingspeak.com\n");
+//        client.print("Connection: close\n");
+//        client.print("X-THINGSPEAKAPIKEY: " + apiKey + "\n");
+//        client.print("Content-Type: application/x-www-form-urlencoded\n");
+//        client.print("Content-Length: ");
+//        client.print(postStr.length());
+//        client.print("\n\n");
+//        client.print(postStr);
+//        delay(1000);
+//   
+//   }//end if
+//   client.stop();
+}
+
+class THSensorService {
+public:
+    THSensorService() {
+        counter = 0;
+        pumpTempIndex = 1;
+        outsideTempIndex = 0;
+        readingErrors = 0;
+        RequestSensors();
+        delay(1000);
+        RequestSensors();
+    }
+    void RequestSensors() {
+        DS18B20.requestTemperatures(); 
+        bool wasError = false;
+        float temps[2];
+        for(int i=0;i<2;i++) {
+            float t = DS18B20.getTempCByIndex(i);
+            if(t < -126 || (t < 85.000001 && t > 84.999999)) {
+                wasError = true;
+            } else {
+                temps[i] = t;
+            }
+        }
+        if(wasError) {
+            readingErrors ++;
+        } else {
+            for(int i=0;i<2;i++) {
+                temperatures[i] = temps[i];
+            }
+            readingErrors = 0;
+        }
+    }
+    bool IsError() {
+        return readingErrors > 10;
+    }
+    float GetPumpTemp() {
+        return temperatures[pumpTempIndex];
+    }
+    float GetOutsideTemp() {
+        return temperatures[outsideTempIndex];
+    }
+private:
+    float temperatures[8];
+    short pumpTempIndex;
+    short outsideTempIndex;
+    int counter;
+    int readingErrors;
+};
+
+class THHardwareState {
+public:
+    THHardwareState() {
+        SetPumpOn(false);
+        SetFanOn(false);
+        SetValveHeatOn(false);
+    }
+    void SetMainRelayOn(bool relayOn) {
+        mainRelayOn = relayOn;
+        pinMode(MAIN_RELAY_PIN, relayOn?OUTPUT:INPUT_PULLUP);
+    }
+    bool IsRelayOn() {
+        return mainRelayOn;
+    }
+    void SetFanOn(bool fanOn) {
+        pinMode(FAN_PIN, fanOn?OUTPUT:INPUT_PULLUP);
+        this->fanOn = fanOn;
+    }
+    bool IsFanOn() {
+        return fanOn;
+    }
+    void SetValveHeatOn(bool valveOn) {
+        pinMode(VALVE_PIN, valveOn?OUTPUT:INPUT_PULLUP);
+        this->valveHeatOn = valveOn;
+    }
+    bool IsValveHeatOn() {
+        return valveHeatOn;
+    }
+    void SetPumpOn(bool pumpOn) {
+        pinMode(PUMP_PIN, pumpOn?OUTPUT:INPUT_PULLUP);
+        digitalWrite(LED_BUILTIN, pumpOn?HIGH:LOW);
+        this->pumpOn = pumpOn;
+    }
+    bool IsPumpOn() {
+        return pumpOn;
+    }
+private:
+    bool fanOn;
+    bool valveHeatOn;
+    bool pumpOn;
+    bool mainRelayOn;
+};
+
+class THDevice {
+public:
+    THDevice() {
+        SetState(TH_STATE_START);
+    }
+    void SetState(int newState) {
+        Serial.print("Set state: ");
+        Serial.println(newState);
+        state == newState;
+        switch(newState) {
+            case TH_STATE_START:
+                Start();
+                break;
+            case TH_STATE_HEAT:
+                Heat();
+                break;
+            case TH_STATE_DEFROST:
+                Defrost();
+                break;
+            case TH_STATE_DEFROST_COOL:
+                DefrostCool();
+                break;
+            case TH_STATE_DEFROST_PAUSE:
+                DefrostPause();
+                break;
+            case TH_STATE_ERROR:
+                Error();
+                break;
+        }
+    }
+    void Tick(long deltaTime) {
+        tempService.RequestSensors();
+        if(IsError() || tempService.IsError()) {
+            SetState(TH_STATE_ERROR);
+            return;
+        }
+        if(stateTime > 0) {
+            stateTime -= deltaTime;
+            if(stateTime <= 0) {
+                SetState(nextState);
+            }
+        }
+        Serial.println(stateTime);
+    }
+private:
+    bool IsError() {
+        Serial.print("Pump temp: ");
+        Serial.println(tempService.GetPumpTemp());
+
+        Serial.print("Out temp: ");
+        Serial.println(tempService.GetOutsideTemp());
+
+        if(tempService.GetPumpTemp() > 84 || tempService.GetPumpTemp() < -7) {
+            return true;
+        }
+        return false;
+    }
+    void Error() {
+        //Turn off all
+        hardwareState.SetPumpOn(false);
+        hardwareState.SetFanOn(false);
+        hardwareState.SetValveHeatOn(false);
+
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(1000);
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(500);
+        digitalWrite(LED_BUILTIN, LOW);
+
+        hardwareState.SetMainRelayOn(false);
+
+        nextState = TH_STATE_HEAT;
+        stateTime = 2 * MINUTES;
+    }
+    void DefrostPause() {
+        hardwareState.SetPumpOn(false);
+        nextState = TH_STATE_HEAT;
+        stateTime = 2 * MINUTES;
+    }
+    void DefrostCool() {
+        hardwareState.SetValveHeatOn(false);
+        delay(1000);
+        hardwareState.SetPumpOn(true);
+        nextState = TH_STATE_DEFROST_PAUSE;
+        stateTime = 2 * MINUTES;
+    }
+    void Defrost() {
+        if(tempService.GetOutsideTemp() > 0) {
+            stateTime = 5 * SECONDS;
+            nextState = TH_STATE_HEAT;
+            return ;
+        }
+        hardwareState.SetPumpOn(false);
+        hardwareState.SetFanOn(false);
+        stateTime = 1 * MINUTES;
+        nextState = TH_STATE_DEFROST_COOL;
+    }
+    void Heat() {
+        hardwareState.SetValveHeatOn(true);
+        delay(1000);
+        hardwareState.SetFanOn(true);
+        delay(1000);
+        hardwareState.SetPumpOn(true);
+                
+        nextState = TH_STATE_DEFROST;
+        stateTime = 50 * MINUTES;
+    }
+    void Start() {
+        hardwareState.SetPumpOn(false);
+        hardwareState.SetFanOn(false);
+        hardwareState.SetValveHeatOn(false);
+        delay(1000);
+        hardwareState.SetMainRelayOn(true);
+        if(tempService.GetOutsideTemp() > 0) {
+            nextState = TH_STATE_HEAT;
+            stateTime = 2 * MINUTES;
+        } else {
+            nextState = TH_STATE_DEFROST;
+            stateTime = 2 * MINUTES;          
+        }
+    }
+
+    int state;
+    int nextState;
+    
+    long stateTime;
+
+    THHardwareState hardwareState;
+    THSensorService tempService;
+};
+
+THDevice* device;
+
+void setup() {
+    pinMode(LED_BUILTIN, OUTPUT);
+
+    device = new THDevice();
+
+    Serial.begin(115200);
+    Serial.println("Booting TH-wifi");
+    delay(5000);
+//    WiFi.mode(WIFI_STA);
+//    WiFi.begin(ssid, password);
+//    while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+//        Serial.println("Connection Failed! Rebooting...");
+//        delay(5000);
+//        ESP.restart();
+//    }
+//
+//    ArduinoOTA.setHostname("TH-wifi");
+//
+//    ArduinoOTA.onStart([]() {
+//        Serial.println("Start");
+//    });
+//    ArduinoOTA.onEnd([]() {
+//        Serial.println("\nEnd");
+//    });
+//    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+//        Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+//    });
+//    ArduinoOTA.onError([](ota_error_t error) {
+//        Serial.printf("Error[%u]: ", error);
+//        if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+//        else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+//        else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+//        else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+//        else if (error == OTA_END_ERROR) Serial.println("End Failed");
+//    });
+//    ArduinoOTA.begin();
+//    Serial.println("Ready");
+//    Serial.print("IP address: ");
+//    Serial.println(WiFi.localIP());    
+}
+
+void loop() {
+//    ArduinoOTA.handle();
+    device->Tick(1000);
+    delay(1000);
+}
