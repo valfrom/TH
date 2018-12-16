@@ -10,9 +10,10 @@
 THDevice* device;
 
 void setup() {
-    device = new THDevice();
-
     Serial.begin(115200);
+
+    device = new THDevice();
+    
     Serial.println("Booting TH-wifi");
     delay(5000);
     WiFi.mode(WIFI_STA);
