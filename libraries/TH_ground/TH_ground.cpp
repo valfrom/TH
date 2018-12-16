@@ -57,7 +57,10 @@ void THDevice::SetState(int newState) {
     Serial.println(newState);
 
     bool needToSend = currentState != newState;
-    currentState == newState;
+    currentState = newState;
+
+    Serial.print("Current state: ");
+    Serial.println(currentState);
 
     if(needToSend) {
         SendCurrentState(true);
