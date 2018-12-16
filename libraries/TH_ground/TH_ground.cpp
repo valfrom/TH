@@ -2,9 +2,9 @@
 #include <TH_conf.h>
 #include "TH_ground.h"
 
-void sendTeperatureTS(float* temps, int count){  
+void sendTeperatureTS(float* temps, int count){
     WiFiClient client;
-  
+
     if (client.connect(SERVER, 80)) { // use ip 184.106.153.149 or api.thingspeak.com
         Serial.println("WiFi Client connected ");
 
@@ -24,7 +24,7 @@ void sendTeperatureTS(float* temps, int count){
         client.print("\n\n");
         client.print(postStr);
         delay(1000);
-   
+
    }//end if
    client.stop();
 }
@@ -47,22 +47,22 @@ bool THHardwareState::IsPumpOn() {
 }
 
 THDevice::THDevice() {
-    state = TH_STATE_NONE;
+    currentState = TH_STATE_NONE;
     counter = 0;
-    SetState(TH_STATE_START);        
+    SetState(TH_STATE_START);
 }
 
 void THDevice::SetState(int newState) {
     Serial.print("Set state: ");
     Serial.println(newState);
 
-    bool needToSend = state != newState;
-    state == newState;
+    bool needToSend = currentState != newState;
+    currentState == newState;
 
     if(needToSend) {
         SendCurrentState(true);
     }
-    
+
     switch(newState) {
         case TH_STATE_START:
             Start();
@@ -92,35 +92,53 @@ void THDevice::SendCurrentState(bool force) {
         temperatures[3] = tempService.GetKegUpTemp();
         temperatures[4] = tempService.GetInTemp();
         temperatures[5] = float(stateTime);
-        temperatures[6] = float(state);
+        temperatures[6] = float(currentState);
         temperatures[7] = float(nextState);
         sendTeperatureTS(temperatures, 8);
     }
 
-    counter++;        
+    counter++;
 }
 
 void THDevice::Update(long deltaTime) {
     tempService.RequestSensors();
     SendCurrentState(false);
-    if(IsError() || tempService.IsError()) {
-        SetState(TH_STATE_ERROR);
-        return;
-    }
+
     if(stateTime > 0) {
         stateTime -= deltaTime;
         if(stateTime <= 0) {
             SetState(nextState);
         }
     }
+    Serial.print("State: ");
+    Serial.print(currentState);
+    Serial.print(" time: ");
     Serial.println(stateTime);
+
+    if(IsError() || tempService.IsError()) {
+        SetState(TH_STATE_ERROR);
+        return;
+    }
+    switch(currentState) {
+        case TH_STATE_HEAT:
+            UpdateHeat();
+            break;
+        default:
+            break;
+    }
+}
+
+void THDevice::UpdateHeat() {
+    if(tempService.GetOutTemp() < -8) {
+        SetState(TH_STATE_DEFROST);
+    }
 }
 
 bool THDevice::IsError() {
-    Serial.print("Pump temp: ");
-    Serial.println(tempService.GetPumpTemp());
+    Serial.print("Out temp: ");
+    Serial.println(tempService.GetOutTemp());
 
-    if(tempService.GetPumpTemp() > 80 || tempService.GetOutTemp() < -8) {
+    if(tempService.GetPumpTemp() > 80) {
         return true;
     }
     return false;
@@ -142,7 +160,7 @@ void THDevice::Error() {
 void THDevice::Heat() {
     if(tempService.GetKegUpTemp() < 50.0) {
         hardwareState.SetPumpOn(true);
-                
+
         nextState = TH_STATE_DEFROST;
         stateTime = 50 * MINUTES;
         return;
@@ -159,7 +177,14 @@ void THDevice::Defrost() {
     }
     hardwareState.SetPumpOn(false);
     nextState = TH_STATE_HEAT;
-    stateTime = 10 * MINUTES;
+
+    if(tempService.GetOutTemp() < -8.0) {
+        stateTime = 30 * MINUTES;
+    } else if(tempService.GetOutTemp() < -6.0) {
+        stateTime = 20 * MINUTES;
+    } else {
+        stateTime = 10 * MINUTES;
+    }
 }
 
 void THDevice::Pause() {
@@ -170,6 +195,10 @@ void THDevice::Pause() {
 
 void THDevice::Start() {
     hardwareState.SetPumpOn(false);
-    nextState = TH_STATE_HEAT;
+    if(tempService.GetOutTemp() < 0.0) {
+        nextState = TH_STATE_DEFROST;
+    } else {
+        nextState = TH_STATE_HEAT;
+    }
     stateTime = 5 * MINUTES;
 }

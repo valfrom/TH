@@ -33,11 +33,13 @@ private:
     void Pause();
     void Start();
 
-    long state;
-    long nextState;
+    void UpdateHeat();
+
+    int currentState;
+    int nextState;
 
     int counter;
-    
+
     long stateTime;
 
     THHardwareState hardwareState;

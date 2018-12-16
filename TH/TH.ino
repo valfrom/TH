@@ -5,16 +5,7 @@
 #include <TH_temp.h>
 #include <TH_ground.h>
 
-#include <TH_conf.h> //Or uncomment code below
-/*#define MAIN_RELAY_PIN 16 //D0
-#define PUMP_PIN 5 //D1
-#define FAN_PIN 4 //D2
-#define VALVE_PIN 0 //D3
-#define ONE_WIRE_BUS 2  // DS18B20 on D4
-const char* ssid = "Wifiname";
-const char* password = "wifipass";
-const char* server = "api.thingspeak.com";
-String apiKey ="API_KEY";*/
+#include <TH_conf.h>
 
 THDevice* device;
 
