@@ -9,18 +9,10 @@ public:
     THSensorService();
     void RequestSensors();
     bool IsError();
-    float GetPumpTemp();
-    float GetKegDownTemp();
-    float GetKegUpTemp();
-    float GetInTemp();
-    float GetOutTemp();
-private:
+protected:
+    short count;
     float temperatures[8];
-    short pumpTempIndex;
-    short outTempIndex;
-    short inTempIndex;
-    short kegDownIndex;
-    short kegUpIndex;
+private:
     int readingErrors;
 };
 
