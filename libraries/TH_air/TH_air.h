@@ -142,6 +142,9 @@ public:
                 SetState(nextState);
             }
         }
+        if(currentState == TH_STATE_DEFROST_COOL) {
+            UpdateDefrost();
+        }
         Serial.println(stateTime);
     }
 private:
@@ -177,6 +180,11 @@ private:
         nextState = TH_STATE_HEAT;
         stateTime = 2 * MINUTES;
     }
+    void UpdateDefrost() {
+        if(tempService.GetTeTemp() > 1.0) {
+            SetState(TH_STATE_DEFROST_PAUSE);
+        }
+    }
     void DefrostPause() {
         hardwareState.SetPumpOn(false);
         nextState = TH_STATE_HEAT;
@@ -187,7 +195,7 @@ private:
         delay(1000);
         hardwareState.SetPumpOn(true);
         nextState = TH_STATE_DEFROST_PAUSE;
-        stateTime = 2 * MINUTES;
+        stateTime = 10 * MINUTES;
     }
     void Defrost() {
         if(tempService.GetOutsideTemp() > 10) {
