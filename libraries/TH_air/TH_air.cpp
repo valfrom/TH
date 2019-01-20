@@ -1,3 +1,4 @@
+#include <ESP8266WiFi.h>
 #include "TH_air.h"
 
 void sendTeperatureTS(float* temps, int count){
