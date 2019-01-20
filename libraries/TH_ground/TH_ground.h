@@ -1,11 +1,4 @@
-#include <TH_temp.h>
-
-#define TH_STATE_NONE 0
-#define TH_STATE_START 1
-#define TH_STATE_HEAT 2
-#define TH_STATE_PAUSE 3
-#define TH_STATE_DEFROST 4
-#define TH_STATE_ERROR 7
+#include "THGround_temp.h"
 
 #ifndef TH_GROUND_H
 #define TH_GROUND_H
@@ -43,7 +36,7 @@ private:
     long stateTime;
 
     THHardwareState hardwareState;
-    THSensorService tempService;
+    THSensorServiceGround tempService;
 };
 
 
