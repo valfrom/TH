@@ -174,7 +174,7 @@ void THDevice::Heat() {
 }
 
 void THDevice::Defrost() {
-    if(tempService.GetOutTemp() > 3.0) {
+    if(tempService.GetOutTemp() > -2.0) {
         SetState(TH_STATE_HEAT);
         return;
     }
