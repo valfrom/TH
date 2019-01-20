@@ -18,7 +18,7 @@ void THSensorService::RequestSensors() {
     if(filters.size() != count) {
         filters.resize(count);
         for(int i=0;i<count;i++) {
-            filters[i] = new SimpleKalmanFilter(10, 10, 0.1);
+            filters[i] = new SimpleKalmanFilter(0.5, 0.5, 0.1);
         }
     }
     bool wasError = false;
@@ -27,6 +27,10 @@ void THSensorService::RequestSensors() {
         float t = DS18B20.getTempCByIndex(i);
         if(t < -126 || (t < 85.000001 && t > 84.999999)) {
             wasError = true;
+            Serial.print("Sensor error: ");
+            Serial.print(i);
+            Serial.print(" temp: ");
+            Serial.println(t);
         } else {
             temps[i] = filters[i]->updateEstimate(t);
         }
