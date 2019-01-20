@@ -4,6 +4,7 @@ THSensorServiceAir::THSensorServiceAir() {
     pumpTempIndex = 0;
     outsideTempIndex = 1;
     teTempIndex = 2;
+    count = 3;
 }
 
 float THSensorServiceAir::GetPumpTemp() {

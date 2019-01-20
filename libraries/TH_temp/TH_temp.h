@@ -10,6 +10,7 @@ public:
     void RequestSensors();
     bool IsError();
 protected:
+    short count;
     float temperatures[8];
 private:
     int readingErrors;

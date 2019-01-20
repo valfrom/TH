@@ -6,6 +6,7 @@ THSensorServiceGround::THSensorServiceGround() : THSensorService() {
     inTempIndex = 0;
     kegDownIndex = 1;
     kegUpIndex = 3;
+    count = 5;
 }
 
 float THSensorServiceGround::GetPumpTemp() {

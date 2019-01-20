@@ -6,6 +6,7 @@ DallasTemperature DS18B20(&oneWire);
 
 THSensorService::THSensorService() {
     readingErrors = 0;
+    count = 0;
     RequestSensors();
     delay(1000);
     RequestSensors();
@@ -14,8 +15,8 @@ THSensorService::THSensorService() {
 void THSensorService::RequestSensors() {
     DS18B20.requestTemperatures();
     bool wasError = false;
-    float temps[5];
-    for(int i=0;i<5;i++) {
+    float temps[count];
+    for(int i=0;i<count;i++) {
         float t = DS18B20.getTempCByIndex(i);
         if(t < -126 || (t < 85.000001 && t > 84.999999)) {
             wasError = true;
@@ -26,7 +27,7 @@ void THSensorService::RequestSensors() {
     if(wasError) {
         readingErrors ++;
     } else {
-        for(int i=0;i<5;i++) {
+        for(int i=0;i<count;i++) {
             temperatures[i] = temps[i];
         }
         readingErrors = 0;
