@@ -1,4 +1,5 @@
 #include <TH_conf.h>
+#include <SimpleKalmanFilter.h>
 #include "TH_temp.h"
 
 OneWire oneWire(ONE_WIRE_BUS);
@@ -14,14 +15,24 @@ THSensorService::THSensorService() {
 
 void THSensorService::RequestSensors() {
     DS18B20.requestTemperatures();
+    if(filters.size() != count) {
+        filters.resize(count);
+        for(int i=0;i<count;i++) {
+            filters[i] = new SimpleKalmanFilter(0.5, 0.5, 0.1);
+        }
+    }
     bool wasError = false;
     float temps[count];
     for(int i=0;i<count;i++) {
         float t = DS18B20.getTempCByIndex(i);
         if(t < -126 || (t < 85.000001 && t > 84.999999)) {
             wasError = true;
+            Serial.print("Sensor error: ");
+            Serial.print(i);
+            Serial.print(" temp: ");
+            Serial.println(t);
         } else {
-            temps[i] = t;
+            temps[i] = filters[i]->updateEstimate(t);
         }
     }
     if(wasError) {

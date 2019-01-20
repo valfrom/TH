@@ -51,6 +51,6 @@ void setup() {
 
 void loop() {
     ArduinoOTA.handle();
-    device->Update(1000 * 45 / 30);
+    device->Update(1000);
     delay(1000);
 }
