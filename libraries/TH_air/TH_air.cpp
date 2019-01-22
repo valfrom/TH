@@ -73,11 +73,14 @@ bool THHardwareState::IsPumpOn() {
 
 THDevice::THDevice() {
     counter = 0;
+    deviceTime = 0;
+    oldSendTime = 0;
     SetState(TH_STATE_START);
 }
 
 void THDevice::SendCurrentState(bool force) {
-    if(counter % 60 == 0 || force) {
+    long delta = deviceTime - oldSendTime;
+    if(delta > 120000 || force) {
         counter = 0;
         float temperatures[8];
         temperatures[0] = tempService.GetOutsideTemp();
@@ -128,6 +131,7 @@ void THDevice::SetState(int newState) {
 }
 
 void THDevice::Update(long deltaTime) {
+    deviceTime += deltaTime;
     tempService.RequestSensors();
     SendCurrentState(false);
     if(IsError() || tempService.IsError()) {

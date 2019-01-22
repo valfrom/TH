@@ -43,6 +43,8 @@ private:
     int nextState;
 
     long stateTime;
+    long deviceTime;
+    long oldSendTime;
 
     THHardwareState hardwareState;
     THSensorServiceAir tempService;
