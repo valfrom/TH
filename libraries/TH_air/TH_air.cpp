@@ -86,7 +86,7 @@ void THDevice::SendCurrentState(bool force) {
         temperatures[0] = tempService.GetOutsideTemp();
         temperatures[1] = tempService.GetPumpTemp();
         temperatures[2] = tempService.GetTeTemp();
-        temperatures[3] = 0;
+        temperatures[3] = tempService.GetBoilerTemp();
         temperatures[4] = 0;
         temperatures[5] = float(stateTime);
         temperatures[6] = float(currentState);
@@ -160,7 +160,10 @@ bool THDevice::IsError() {
     Serial.print("Te temp: ");
     Serial.println(tempService.GetTeTemp());
 
-    if(tempService.GetPumpTemp() > 84 || tempService.GetPumpTemp() < -7) {
+    Serial.print("Boiler temp: ");
+    Serial.println(tempService.GetBoilerTemp());
+
+    if(tempService.GetPumpTemp() > 80 || tempService.GetPumpTemp() < -7) {
         return true;
     }
     return false;
@@ -201,7 +204,7 @@ void THDevice::DefrostCool() {
     delay(1000);
     hardwareState.SetPumpOn(true);
     nextState = TH_STATE_DEFROST_PAUSE;
-    stateTime = 10 * MINUTES;
+    stateTime = 3 * MINUTES;
 }
 
 void THDevice::Defrost() {
@@ -210,7 +213,7 @@ void THDevice::Defrost() {
         nextState = TH_STATE_HEAT;
         return ;
     }
-    if(tempService.GetTeTemp() > 3.0) {
+    if(tempService.GetTeTemp() > 3.0 && tempService.GetOutsideTemp() > 3.0) {
         stateTime = 5 * MINUTES;
         hardwareState.SetPumpOn(false);
         hardwareState.SetFanOn(true);

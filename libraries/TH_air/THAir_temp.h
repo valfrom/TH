@@ -9,10 +9,12 @@ public:
     float GetPumpTemp();
     float GetOutsideTemp();
     float GetTeTemp();
+    float GetBoilerTemp();
 private:
     short pumpTempIndex;
     short outsideTempIndex;
     short teTempIndex;
+    short boilerTempIndex;
 };
 
 #endif //TH_GROUND_TEMP_H
