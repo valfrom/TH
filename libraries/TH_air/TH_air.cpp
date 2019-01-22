@@ -176,7 +176,7 @@ void THDevice::Error() {
 
     hardwareState.SetMainRelayOn(false);
 
-    nextState = TH_STATE_HEAT;
+    nextState = TH_STATE_START;
     stateTime = 2 * MINUTES;
 }
 
@@ -201,10 +201,17 @@ void THDevice::DefrostCool() {
 }
 
 void THDevice::Defrost() {
-    if(tempService.GetOutsideTemp() > 10) {
+    if(tempService.GetOutsideTemp() > 15) {
         stateTime = 5 * SECONDS;
         nextState = TH_STATE_HEAT;
         return ;
+    }
+    if(tempService.GetTeTemp() > 3.0) {
+        stateTime = 5 * MINUTES;
+        hardwareState.SetPumpOn(false);
+        hardwareState.SetFanOn(true);
+        nextState = TH_STATE_HEAT;
+        return;
     }
     hardwareState.SetPumpOn(false);
     hardwareState.SetFanOn(false);

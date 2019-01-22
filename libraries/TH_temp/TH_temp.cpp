@@ -13,6 +13,45 @@ THSensorService::THSensorService() {
     RequestSensors();
 }
 
+void swap(int *xp, int *yp) 
+{ 
+    int temp = *xp; 
+    *xp = *yp; 
+    *yp = temp; 
+} 
+  
+// An optimized version of Bubble Sort 
+void bubbleSort(int arr[], int n) 
+{ 
+   int i, j; 
+   bool swapped; 
+   for (i = 0; i < n-1; i++) 
+   { 
+     swapped = false; 
+     for (j = 0; j < n-i-1; j++) 
+     { 
+        if (arr[j] > arr[j+1]) 
+        { 
+           swap(&arr[j], &arr[j+1]); 
+           swapped = true; 
+        } 
+     } 
+  
+     // IF no two elements were swapped by inner loop, then break 
+     if (swapped == false) 
+        break; 
+   } 
+} 
+
+float GetMedianTemperature(int index) {
+    float t[5];
+    for(int i=0;i<5;i++) {
+        t[i] = DS18B20.getTempCByIndex(index);
+    }
+    bubbleSort(t, 5);
+    return t[2];
+}
+
 void THSensorService::RequestSensors() {
     DS18B20.requestTemperatures();
     if(filters.size() != count) {
@@ -24,7 +63,7 @@ void THSensorService::RequestSensors() {
     bool wasError = false;
     float temps[count];
     for(int i=0;i<count;i++) {
-        float t = DS18B20.getTempCByIndex(i);
+        float t = GetMedianTemperature(i);
         if(t < -126 || (t < 85.000001 && t > 84.999999)) {
             wasError = true;
             Serial.print("Sensor error: ");
