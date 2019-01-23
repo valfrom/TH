@@ -48,6 +48,7 @@ float GetMedianTemperature(DeviceAddress& addr) {
     for(int i=0;i<5;i++) {
         DS18B20.requestTemperaturesByAddress(addr);
         t[i] = DS18B20.getTempC(addr);
+        Serial.println(t[i]);
         delay(2000);
     }
     bubbleSort(t, 5);
@@ -55,12 +56,17 @@ float GetMedianTemperature(DeviceAddress& addr) {
 }
 
 bool THSensorService::MapAddresses() {
-    sensorsMapped = true;
+    sensorsMapped = count > 0;
     for(int i=0;i<count;i++) {
         if(!DS18B20.getAddress(addrs[i], i)) {
             sensorsMapped = false;
             break;
         }
+        Serial.print("Mapped: ");
+        for(int j=0;j<8;j++) {
+            Serial.print(addrs[i][j]);
+        }
+        Serial.println();
     }
 }
 
