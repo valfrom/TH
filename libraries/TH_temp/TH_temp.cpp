@@ -55,19 +55,19 @@ float GetMedianTemperature(DeviceAddress& addr) {
 }
 
 bool THSensorService::MapAddresses() {
-    addrs.resize(count);    
+    sensorsMapped = true;
     for(int i=0;i<count;i++) {
         if(!DS18B20.getAddress(addrs[i], i)) {
-            addrs.resize(0);
+            sensorsMapped = false;
             break;
         }
     }
 }
 
 void THSensorService::RequestSensors() {
-    if(addrs.size() != count) {
+    if(!sensorsMapped) {
         MapAddresses();
-        if(addrs.size() != count) {
+        if(!sensorsMapped) {
             readingErrors++;
             return;
         }
