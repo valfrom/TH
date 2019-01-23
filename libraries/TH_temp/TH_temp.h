@@ -11,12 +11,14 @@ public:
     THSensorService();
     void RequestSensors();
     bool IsError();
+    bool MapAddresses();
 protected:
     short count;
     float temperatures[8];
 private:
     int readingErrors;
     std::vector<SimpleKalmanFilter*> filters;
+    std::vector<DeviceAddress> addrs;
 };
 
 #endif //TH_TEMP_H

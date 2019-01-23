@@ -31,12 +31,13 @@ public:
 private:
     bool IsError();
     void Error();
-    void UpdateDefrost();
+    void UpdateDefrostCool();
     void DefrostPause();
     void DefrostCool();
     void Defrost();
     void Heat();
     void Start();
+    void Pause();
 
     int currentState;
     int counter;
