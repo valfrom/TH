@@ -203,11 +203,12 @@ void THDevice::DefrostPause() {
 }
 
 void THDevice::DefrostCool() {
+    hardwareState.SetFanOn(false);
     hardwareState.SetValveHeatOn(false);
     delay(1000);
     hardwareState.SetPumpOn(true);
     nextState = TH_STATE_DEFROST_PAUSE;
-    stateTime = 3 * MINUTES;
+    stateTime = 8 * MINUTES;
 }
 
 void THDevice::Defrost() {
@@ -216,15 +217,19 @@ void THDevice::Defrost() {
         nextState = TH_STATE_HEAT;
         return ;
     }
-    if(tempService.GetTeTemp() > 3.0 && tempService.GetOutsideTemp() > 3.0) {
-        stateTime = 5 * MINUTES;
+    if(tempService.GetTeTemp() > 3.0 && tempService.GetOutsideTemp() > 10.0) {
+        stateTime = 10 * MINUTES;
         hardwareState.SetPumpOn(false);
         hardwareState.SetFanOn(true);
         nextState = TH_STATE_HEAT;
         return;
     }
     hardwareState.SetPumpOn(false);
-    hardwareState.SetFanOn(false);
+    if(tempService.GetOutsideTemp() > 0.7) {
+        hardwareState.SetFanOn(true);
+    } else {
+        hardwareState.SetFanOn(false);
+    }
     stateTime = 1 * MINUTES;
     nextState = TH_STATE_DEFROST_COOL;
 }
