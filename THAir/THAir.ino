@@ -9,6 +9,8 @@
 
 THDevice* device;
 
+volatile int currentTime = millis();
+
 void setup() {
     Serial.begin(115200);
 
@@ -51,6 +53,8 @@ void setup() {
 
 void loop() {
     ArduinoOTA.handle();
-    device->Update(1000);
+    int delta = millis() - currentTime;
+    currentTime = millis();
+    device->Update(delta);
     delay(1000);
 }

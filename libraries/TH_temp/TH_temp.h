@@ -15,8 +15,11 @@ protected:
     short count;
     float temperatures[8];
 private:
+    bool MapAddresses();
+    bool sensorsMapped;
     int readingErrors;
     std::vector<SimpleKalmanFilter*> filters;
+    DeviceAddress addrs[8];
 };
 
 #endif //TH_TEMP_H

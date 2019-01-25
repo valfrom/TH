@@ -4,7 +4,8 @@ THSensorServiceAir::THSensorServiceAir() {
     pumpTempIndex = 0;
     outsideTempIndex = 1;
     teTempIndex = 2;
-    count = 3;
+    boilerTempIndex = 3;
+    count = 4;
 }
 
 float THSensorServiceAir::GetPumpTemp() {
@@ -15,4 +16,7 @@ float THSensorServiceAir::GetOutsideTemp() {
 }
 float THSensorServiceAir::GetTeTemp() {
     return temperatures[teTempIndex];
+}
+float THSensorServiceAir::GetBoilerTemp() {
+    return temperatures[boilerTempIndex];
 }
