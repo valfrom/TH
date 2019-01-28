@@ -8,9 +8,9 @@ DallasTemperature DS18B20(&oneWire);
 THSensorService::THSensorService() {
     readingErrors = 0;
     count = 0;
-    RequestSensors();
-    delay(1000);
-    RequestSensors();
+    for(int i=0;i<8;i++) {
+        filters[i] = new SimpleKalmanFilter(0.5, 0.5, 0.1);
+    }
 }
 
 void swap(float *xp, float *yp)
@@ -78,12 +78,7 @@ void THSensorService::RequestSensors() {
             return;
         }
     }
-    if(filters.size() != count) {
-        filters.resize(count);
-        for(int i=0;i<count;i++) {
-            filters[i] = new SimpleKalmanFilter(0.5, 0.5, 0.1);
-        }
-    }
+    
     bool wasError = false;
     float temps[count];
     for(int i=0;i<count;i++) {

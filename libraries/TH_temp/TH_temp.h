@@ -18,7 +18,7 @@ private:
     bool MapAddresses();
     bool sensorsMapped;
     int readingErrors;
-    std::vector<SimpleKalmanFilter*> filters;
+    SimpleKalmanFilter* filters[8];
     DeviceAddress addrs[8];
 };
 
