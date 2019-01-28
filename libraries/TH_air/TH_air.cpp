@@ -177,6 +177,7 @@ void THDevice::Update(long deltaTime) {
 
     switch(currentState) {
         case TH_STATE_DEFROST_COOL:
+        case TH_STATE_DEFROST_COOL_HIGH:
             UpdateDefrostCool();
             break;
         case TH_STATE_HEAT:
@@ -205,7 +206,7 @@ bool THDevice::IsError() {
     Serial.print("Boiler temp: ");
     Serial.println(tempService.GetBoilerTemp());
 
-    if(tempService.GetPumpTemp() > 80 || tempService.GetPumpTemp() < -7) {
+    if(tempService.GetPumpTemp() > 70 || tempService.GetPumpTemp() < -7) {
         return true;
     }
     return false;
@@ -230,6 +231,9 @@ void THDevice::Error() {
 }
 
 void THDevice::UpdateDefrostCool() {
+    if(tempService.GetPumpTemp() > 60) {
+        hardwareState.SetPumpOn(false);
+    }
 }
 
 void THDevice::UpdateHeat() {
@@ -239,17 +243,17 @@ void THDevice::UpdateHeat() {
     }
     switch(currentState) {
         case TH_STATE_HEAT:
-            if(hardwareState.GetPumpOnTime() > 45 * MINUTES) {                
+            if(hardwareState.GetPumpOnTime() > 45 * MINUTES) {
                 SetState(TH_STATE_HEAT_B);
             }
             break;
         case TH_STATE_HEAT_B:
-            if(hardwareState.GetPumpOnTime() > 70 * MINUTES) {                
+            if(hardwareState.GetPumpOnTime() > 70 * MINUTES) {
                 SetState(TH_STATE_HEAT_C);
             }
             break;
         case TH_STATE_HEAT_C:
-            if(hardwareState.GetPumpOnTime() > 120 * MINUTES) {                
+            if(hardwareState.GetPumpOnTime() > 120 * MINUTES) {
                 SetState(TH_STATE_HEAT_A);
             }
             break;
@@ -302,7 +306,7 @@ void THDevice::Defrost() {
         default:
             nextState = TH_STATE_DEFROST_COOL;
             break;
-    }   
+    }
 }
 
 void THDevice::Pause() {
@@ -362,6 +366,10 @@ void THDevice::Start() {
     hardwareState.SetValveHeatOn(false);
     delay(1000);
     hardwareState.SetMainRelayOn(true);
-    nextState = TH_STATE_HEAT;
+    if(tempService.GetOutsideTemp() < 10) {
+        nextState = TH_STATE_DEFROST;
+    } else {
+        nextState = TH_STATE_HEAT;
+    }
     stateTime = 2 * MINUTES;
 }
