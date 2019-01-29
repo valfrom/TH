@@ -238,7 +238,7 @@ void THDevice::UpdateDefrostCool() {
 }
 
 void THDevice::UpdateHeat() {
-    if(tempService.GetBoilerTemp() > 32) {
+    if(tempService.GetBoilerTemp() > 30) {
         SetState(TH_STATE_PAUSE);
         return;
     }
@@ -258,11 +258,16 @@ void THDevice::UpdateHeat() {
                 SetState(TH_STATE_HEAT_A);
             }
             break;
+        case TH_STATE_HEAT_A:
+            if(tempService.GetTeTemp() < 50.0 && hardwareState.GetPumpOnTime() > 3 * HOURS) {
+                SetState(TH_STATE_DEFROST);
+            }
+            break;
     }
 }
 
 void THDevice::UpdatePause() {
-    if(tempService.GetBoilerTemp() < 30) {
+    if(tempService.GetBoilerTemp() < 28) {
         SetState(TH_STATE_START);
         return;
     }
