@@ -6,6 +6,7 @@ THSensorServiceAir::THSensorServiceAir() {
     teTempIndex = 2;
     boilerTempIndex = 3;
     count = 4;
+    RequestSensors();
 }
 
 float THSensorServiceAir::GetPumpTemp() {
