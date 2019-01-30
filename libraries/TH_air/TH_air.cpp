@@ -329,6 +329,10 @@ void THDevice::Pause() {
 }
 
 void THDevice::Heat() {
+    if(tempService.GetBoilerTemp() > 40) {
+        SetState(TH_STATE_PAUSE);
+        return;
+    }
     previousTemp = tempService.GetTeTemp();
     hardwareState.SetValveHeatOn(true);
     delay(1000);
