@@ -96,19 +96,56 @@ void THDevice::SendCurrentState(bool force) {
     long delta = deviceTime - oldSendTime;
     if(delta > 120000 || force) {
         counter = 0;
-        float temperatures[8];
-        temperatures[0] = tempService.GetOutsideTemp();
-        temperatures[1] = tempService.GetPumpTemp();
-        temperatures[2] = tempService.GetTeTemp();
-        temperatures[3] = tempService.GetBoilerTemp();
-        temperatures[4] = 0;
-        temperatures[5] = float(stateTime);
-        temperatures[6] = float(currentState);
-        temperatures[7] = float(nextState);
-        sendTeperatureTS(temperatures, 8);
+        float values[8];
+        values[0] = tempService.GetOutsideTemp();
+        values[1] = tempService.GetPumpTemp();
+        values[2] = tempService.GetTeTemp();
+        values[3] = tempService.GetBoilerTemp();
+        values[4] = 0;
+        values[5] = float(stateTime);
+        values[6] = float(currentState);
+        values[7] = float(nextState);
+        sendTeperatureTS(values, 8);
     }
 
     counter++;
+}
+
+bool THDevice::IsError() {
+    Serial.print("Pump temp: ");
+    Serial.println(tempService.GetPumpTemp());
+
+    Serial.print("Out temp: ");
+    Serial.println(tempService.GetOutsideTemp());
+
+    Serial.print("Te temp: ");
+    Serial.println(tempService.GetTeTemp());
+
+    Serial.print("Boiler temp: ");
+    Serial.println(tempService.GetBoilerTemp());
+
+    if(tempService.GetPumpTemp() > 70 || tempService.GetPumpTemp() < -7) {
+        return true;
+    }
+    return false;
+}
+
+void THDevice::Error() {
+    //Turn off all
+    hardwareState.SetPumpOn(false);
+    hardwareState.SetFanOn(false);
+    hardwareState.SetValveHeatOn(false);
+
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(1000);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(500);
+    digitalWrite(LED_BUILTIN, LOW);
+
+    hardwareState.SetMainRelayOn(false);
+
+    nextState = TH_STATE_START;
+    stateTime = 2 * MINUTES;
 }
 
 void THDevice::SetState(int newState) {
@@ -194,51 +231,21 @@ void THDevice::Update(long deltaTime) {
     Serial.println(stateTime);
 }
 
-bool THDevice::IsError() {
-    Serial.print("Pump temp: ");
-    Serial.println(tempService.GetPumpTemp());
-
-    Serial.print("Out temp: ");
-    Serial.println(tempService.GetOutsideTemp());
-
-    Serial.print("Te temp: ");
-    Serial.println(tempService.GetTeTemp());
-
-    Serial.print("Boiler temp: ");
-    Serial.println(tempService.GetBoilerTemp());
-
-    if(tempService.GetPumpTemp() > 70 || tempService.GetPumpTemp() < -7) {
-        return true;
-    }
-    return false;
-}
-
-void THDevice::Error() {
-    //Turn off all
-    hardwareState.SetPumpOn(false);
-    hardwareState.SetFanOn(false);
-    hardwareState.SetValveHeatOn(false);
-
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(1000);
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(500);
-    digitalWrite(LED_BUILTIN, LOW);
-
-    hardwareState.SetMainRelayOn(false);
-
-    nextState = TH_STATE_START;
-    stateTime = 2 * MINUTES;
-}
-
 void THDevice::UpdateDefrostCool() {
     if(tempService.GetPumpTemp() > 60) {
         hardwareState.SetPumpOn(false);
     }
 }
 
+void THDevice::UpdatePause() {
+    if(tempService.GetBoilerTemp() < 40.0) {
+        SetState(TH_STATE_START);
+        return;
+    }
+}
+
 void THDevice::UpdateHeat() {
-    if(tempService.GetBoilerTemp() > 30) {
+    if(tempService.GetBoilerTemp() > 40) {
         SetState(TH_STATE_PAUSE);
         return;
     }
@@ -263,13 +270,6 @@ void THDevice::UpdateHeat() {
                 SetState(TH_STATE_DEFROST);
             }
             break;
-    }
-}
-
-void THDevice::UpdatePause() {
-    if(tempService.GetBoilerTemp() < 28) {
-        SetState(TH_STATE_START);
-        return;
     }
 }
 
@@ -299,7 +299,7 @@ void THDevice::DefrostCoolHigh() {
 
 void THDevice::Defrost() {
     hardwareState.SetPumpOn(false);
-    if(tempService.GetOutsideTemp() > 15) {
+    if(tempService.GetOutsideTemp() > 15.0) {
         stateTime = 15 * MINUTES;
         nextState = TH_STATE_HEAT;
         return;
@@ -325,7 +325,7 @@ void THDevice::Pause() {
     hardwareState.SetPumpOn(false);
 
     nextState = TH_STATE_PAUSE;
-    stateTime = 20 * MINUTES;
+    stateTime = 10 * MINUTES;
 }
 
 void THDevice::Heat() {
@@ -345,7 +345,7 @@ void THDevice::HeatA() {
     stateTime = 16 * MINUTES;
     float currentTemp = tempService.GetTeTemp();
     float delta2 = currentTemp - tempService.GetBoilerTemp();
-    if(delta2 < 20 || currentTemp < 40.0) {
+    if(delta2 < 8.0 || currentTemp < 40.0) {
         SetState(TH_STATE_DEFROST);
     }
 }
@@ -358,7 +358,7 @@ void THDevice::HeatB() {
     float delta2 = currentTemp - tempService.GetBoilerTemp();
     previousTemp = currentTemp;
 
-    if(delta > 1.0 && (delta2 < 15.0 || currentTemp < 40.0)) {
+    if(delta > 1.0 && (delta2 < 3.0 || currentTemp < 40.0)) {
         SetState(TH_STATE_DEFROST);
     }
 }
@@ -368,7 +368,7 @@ void THDevice::HeatC() {
     stateTime = 16 * MINUTES;
     float currentTemp = tempService.GetTeTemp();
     float delta2 = currentTemp - tempService.GetBoilerTemp();
-    if(delta2 < 15.0 || currentTemp < 40.0) {
+    if(delta2 < 3.0 || currentTemp < 40.0) {
         SetState(TH_STATE_DEFROST);
     }
 }
