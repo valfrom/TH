@@ -245,7 +245,7 @@ void THDevice::UpdatePause() {
 }
 
 void THDevice::UpdateHeat() {
-    if(tempService.GetBoilerTemp() > 40) {
+    if(tempService.GetBoilerTemp() > 42) {
         SetState(TH_STATE_PAUSE);
         return;
     }
@@ -329,7 +329,7 @@ void THDevice::Pause() {
 }
 
 void THDevice::Heat() {
-    if(tempService.GetBoilerTemp() > 40) {
+    if(tempService.GetBoilerTemp() > 42) {
         SetState(TH_STATE_PAUSE);
         return;
     }
@@ -383,7 +383,7 @@ void THDevice::Start() {
     hardwareState.SetValveHeatOn(false);
     delay(1000);
     hardwareState.SetMainRelayOn(true);
-    if(tempService.GetOutsideTemp() < 5) {
+    if(tempService.GetOutsideTemp() < 2) {
         nextState = TH_STATE_DEFROST;
     } else {
         nextState = TH_STATE_HEAT;
