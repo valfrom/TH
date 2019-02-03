@@ -1,7 +1,7 @@
 #include <TH_temp.h>
 
-#ifndef TH_GROUND_TEMP_H
-#define TH_GROUND_TEMP_H
+#ifndef TH_AIR_TEMP_H
+#define TH_AIR_TEMP_H
 
 class THSensorServiceAir : public THSensorService {
 public:
@@ -17,4 +17,4 @@ private:
     short boilerTempIndex;
 };
 
-#endif //TH_GROUND_TEMP_H
+#endif //TH_AIR_TEMP_H

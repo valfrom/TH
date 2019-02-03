@@ -28,62 +28,6 @@ void sendTeperatureTS(float* temps, int count){
    client.stop();
 }
 
-THHardwareState::THHardwareState() {
-    SetPumpOn(false);
-    SetFanOn(false);
-    SetValveHeatOn(false);
-}
-
-void THHardwareState::SetMainRelayOn(bool relayOn) {
-    mainRelayOn = relayOn;
-    pinMode(MAIN_RELAY_PIN, relayOn?OUTPUT:INPUT_PULLUP);
-}
-
-bool THHardwareState::IsRelayOn() {
-    return mainRelayOn;
-}
-
-void THHardwareState::SetFanOn(bool fanOn) {
-    pinMode(FAN_PIN, fanOn?OUTPUT:INPUT_PULLUP);
-    this->fanOn = fanOn;
-}
-
-bool THHardwareState::IsFanOn() {
-    return fanOn;
-}
-
-void THHardwareState::SetValveHeatOn(bool valveOn) {
-    pinMode(VALVE_PIN, valveOn?OUTPUT:INPUT_PULLUP);
-    this->valveHeatOn = valveOn;
-}
-
-bool THHardwareState::IsValveHeatOn() {
-    return valveHeatOn;
-}
-
-void THHardwareState::Update(long deltaTime) {
-    if(pumpOn) {
-        pumpOnTime += deltaTime;
-    }
-}
-
-long THHardwareState::GetPumpOnTime() {
-    return pumpOnTime;
-}
-
-void THHardwareState::SetPumpOn(bool pumpOn) {
-    pinMode(PUMP_PIN, pumpOn?OUTPUT:INPUT_PULLUP);
-    digitalWrite(LED_BUILTIN, pumpOn?HIGH:LOW);
-    this->pumpOn = pumpOn;
-    if(!pumpOn) {
-        pumpOnTime = 0;
-    }
-}
-
-bool THHardwareState::IsPumpOn() {
-    return pumpOn;
-}
-
 THDevice::THDevice() {
     counter = 0;
     deviceTime = 0;
@@ -141,8 +85,6 @@ void THDevice::Error() {
     digitalWrite(LED_BUILTIN, HIGH);
     delay(500);
     digitalWrite(LED_BUILTIN, LOW);
-
-    hardwareState.SetMainRelayOn(false);
 
     nextState = TH_STATE_START;
     stateTime = 2 * MINUTES;
@@ -381,8 +323,6 @@ void THDevice::Start() {
     hardwareState.SetPumpOn(false);
     hardwareState.SetFanOn(false);
     hardwareState.SetValveHeatOn(false);
-    delay(1000);
-    hardwareState.SetMainRelayOn(true);
     if(tempService.GetOutsideTemp() < 2) {
         nextState = TH_STATE_DEFROST;
     } else {

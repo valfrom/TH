@@ -1,29 +1,9 @@
 #include <TH_conf.h>
 #include "THAir_temp.h"
+#include "THAir_hardware.h"
 
-#ifndef TH_AIR_TEMP_H
-#define TH_AIR_TEMP_H
-
-class THHardwareState {
-public:
-    THHardwareState();
-    void SetMainRelayOn(bool relayOn);
-    bool IsRelayOn();
-    void SetFanOn(bool fanOn);
-    bool IsFanOn();
-    void SetValveHeatOn(bool valveOn);
-    bool IsValveHeatOn();
-    void SetPumpOn(bool pumpOn);
-    bool IsPumpOn();
-    long GetPumpOnTime();
-    void Update(long deltaTime);
-private:
-    bool fanOn;
-    bool valveHeatOn;
-    bool pumpOn;
-    bool mainRelayOn;
-    long pumpOnTime;
-};
+#ifndef TH_AIR_H
+#define TH_AIR_H
 
 class THDevice {
 public:
@@ -63,4 +43,4 @@ private:
     THSensorServiceAir tempService;
 };
 
-#endif //TH_AIR_TEMP_H
+#endif //TH_AIR_H
