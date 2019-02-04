@@ -20,6 +20,7 @@ private:
     bool pumpOn;
     bool mainRelayOn;
     long pumpOnTime;
+    long previousTimePumpOn;
 };
 
 #endif //TH_AIR_HARDWARE_H

@@ -191,6 +191,16 @@ void THDevice::UpdateHeat() {
         SetState(TH_STATE_PAUSE);
         return;
     }
+    if(tempService.GetTeTemp() > 48 || !hardwareState.IsPumpOn()) {
+        hardwareState.SetFanOn(false);
+    } else if(tempService.GetTeTemp() < 42 && hardwareState.IsPumpOn()) {
+        hardwareState.SetFanOn(true);
+    }
+    if(tempService.GetTeTemp() > 51) {
+        hardwareState.SetPumpOn(false);
+    } else if(tempService.GetTeTemp() < 49) {
+        hardwareState.SetPumpOn(true);
+    }
     switch(currentState) {
         case TH_STATE_HEAT:
             if(hardwareState.GetPumpOnTime() > 45 * MINUTES) {
@@ -236,7 +246,7 @@ void THDevice::DefrostCoolHigh() {
     delay(1000);
     hardwareState.SetPumpOn(true);
     nextState = TH_STATE_DEFROST_PAUSE;
-    stateTime = 10 * MINUTES;
+    stateTime = 6 * MINUTES;
 }
 
 void THDevice::Defrost() {
@@ -250,7 +260,7 @@ void THDevice::Defrost() {
     } else {
         hardwareState.SetFanOn(false);
     }
-    stateTime = 2 * MINUTES;
+    stateTime = 5 * MINUTES;
     switch(previousState) {
         case TH_STATE_HEAT_C:
             nextState = TH_STATE_DEFROST_COOL_HIGH;
@@ -277,13 +287,9 @@ void THDevice::Heat() {
     }
     previousTemp = tempService.GetTeTemp();
     hardwareState.SetValveHeatOn(true);
-    delay(1000);
-    hardwareState.SetFanOn(true);
-    delay(1000);
-    hardwareState.SetPumpOn(true);
 
     nextState = TH_STATE_HEAT;
-    stateTime = 16 * MINUTES;
+    stateTime = 4 * MINUTES;
 }
 
 void THDevice::HeatA() {
