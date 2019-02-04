@@ -48,6 +48,9 @@ void THHardwareState::SetPumpOn(bool pumpOn) {
     digitalWrite(LED_BUILTIN, pumpOn?HIGH:LOW);
     this->pumpOn = pumpOn;
     previousTimePumpOn = 4 * MINUTES;
+    if(!pumpOn) {
+        pumpOnTime = 0;
+    }
 }
 
 bool THHardwareState::IsPumpOn() {
