@@ -25,6 +25,7 @@ private:
   float _current_estimate;
   float _last_estimate;
   float _kalman_gain;
+  bool _first;
   
 };
 
