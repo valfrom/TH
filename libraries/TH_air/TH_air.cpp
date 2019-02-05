@@ -191,14 +191,24 @@ void THDevice::UpdateHeat() {
         SetState(TH_STATE_PAUSE);
         return;
     }
-    if(tempService.GetTeTemp() > 50 || !hardwareState.IsPumpOn()) {
+    float t1 = 50;
+    float t2 = 46;
+    float t3 = 56;
+    float t4 = 49;
+
+    if(tempService.GetBoilerTemp() > 38) {
+        t1 = 53;
+        t3 = 59;
+    }
+
+    if(tempService.GetTeTemp() > t1 || !hardwareState.IsPumpOn()) {
         hardwareState.SetFanOn(false);
-    } else if(tempService.GetTeTemp() < 46 && hardwareState.IsPumpOn() && hardwareState.GetPumpOnTime() > 5 * MINUTES) {
+    } else if(tempService.GetTeTemp() < t2 && hardwareState.IsPumpOn() && hardwareState.GetPumpOnTime() > 5 * MINUTES) {
         hardwareState.SetFanOn(true);
     }
-    if(tempService.GetTeTemp() > 56) {
+    if(tempService.GetTeTemp() > t3) {
         hardwareState.SetPumpOn(false);
-    } else if(tempService.GetTeTemp() < 49) {
+    } else if(tempService.GetTeTemp() < t4) {
         hardwareState.SetPumpOn(true);
     }
     switch(currentState) {
