@@ -56,18 +56,6 @@ void THDevice::SendCurrentState(bool force) {
 }
 
 bool THDevice::IsError() {
-    Serial.print("Pump temp: ");
-    Serial.println(tempService.GetPumpTemp());
-
-    Serial.print("Out temp: ");
-    Serial.println(tempService.GetOutsideTemp());
-
-    Serial.print("Te temp: ");
-    Serial.println(tempService.GetTeTemp());
-
-    Serial.print("Boiler temp: ");
-    Serial.println(tempService.GetBoilerTemp());
-
     if(tempService.GetPumpTemp() > 70 || tempService.GetPumpTemp() < -7) {
         return true;
     }
@@ -95,8 +83,23 @@ void THDevice::SetState(int newState) {
     previousState = currentState;
     currentState = newState;
 
+    Serial.print("Pump temp: ");
+    Serial.println(tempService.GetPumpTemp());
+
+    Serial.print("Out temp: ");
+    Serial.println(tempService.GetOutsideTemp());
+
+    Serial.print("Te temp: ");
+    Serial.println(tempService.GetTeTemp());
+
+    Serial.print("Boiler temp: ");
+    Serial.println(tempService.GetBoilerTemp());
+
     Serial.print("Current state: ");
     Serial.println(currentState);
+
+    Serial.print("Pump time on: ");
+    Serial.println(hardwareState.GetPumpOnTime());
 
     if(needToSend) {
         SendCurrentState(true);
@@ -310,7 +313,7 @@ void THDevice::HeatA() {
     stateTime = 16 * MINUTES;
     float currentTemp = tempService.GetTeTemp();
     float delta2 = currentTemp - tempService.GetBoilerTemp();
-    if(hardwareState.GetPumpOnTime() > 5 * MINUTES && delta2 < 8.0 || currentTemp < 40.0) {
+    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && delta2 < 8.0 || currentTemp < 40.0) {
         SetState(TH_STATE_DEFROST);
     }
 }
