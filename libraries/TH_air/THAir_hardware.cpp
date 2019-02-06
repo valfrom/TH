@@ -3,6 +3,8 @@
 
 THHardwareState::THHardwareState() {
     previousTimePumpOn = 0;
+    pumpTotalOnTime = 0;
+    pumpOnTime = 0;
     SetPumpOn(false);
     SetFanOn(false);
     SetValveHeatOn(false);
@@ -31,12 +33,17 @@ void THHardwareState::Update(long deltaTime) {
         previousTimePumpOn -= deltaTime;
     }
     if(pumpOn) {
+        pumpTotalOnTime += deltaTime;
         pumpOnTime += deltaTime;
     }
 }
 
 long THHardwareState::GetPumpOnTime() {
     return pumpOnTime;
+}
+
+long THHardwareState::GetTotalPumpOnTime() {
+    return pumpTotalOnTime;
 }
 
 void THHardwareState::SetPumpOn(bool pumpOn) {
