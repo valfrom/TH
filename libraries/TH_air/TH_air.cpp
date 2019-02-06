@@ -45,7 +45,7 @@ void THDevice::SendCurrentState(bool force) {
         values[1] = tempService.GetPumpTemp();
         values[2] = tempService.GetTeTemp();
         values[3] = tempService.GetBoilerTemp();
-        values[4] = 0;
+        values[4] = hardwareState.GetPumpOnTime();
         values[5] = float(stateTime);
         values[6] = float(currentState);
         values[7] = float(nextState);
