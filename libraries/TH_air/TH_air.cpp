@@ -48,7 +48,7 @@ void THDevice::SendCurrentState(bool force) {
         values[4] = hardwareState.GetPumpOnTime();
         values[5] = float(stateTime);
         values[6] = float(currentState);
-        values[7] = hardwareState.IsPumpOn()?1:0 + hardwareState.IsFanOn()?10:0 + hardwareState.IsValveHeatOn()?100:0;
+        values[7] = (hardwareState.IsPumpOn()?1:0) + (hardwareState.IsFanOn()?10:0) + (hardwareState.IsValveHeatOn()?100:0);
         sendTeperatureTS(values, 8);
     }
 
