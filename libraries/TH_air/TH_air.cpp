@@ -190,7 +190,7 @@ void THDevice::UpdatePause() {
 }
 
 void THDevice::UpdateHeat() {
-    if(tempService.GetBoilerTemp() > 42) {
+    if(tempService.GetBoilerTemp() > 40) {
         SetState(TH_STATE_PAUSE);
         return;
     }
@@ -233,7 +233,7 @@ void THDevice::UpdateHeat() {
             }
             break;
         case TH_STATE_HEAT_A:
-            if(tempService.GetBoilerTemp() > 38.0 && hardwareState.GetPumpOnTime() > 40 * MINUTES && tempService.GetOutsideTemp() > 0.0 && tempService.GetTeTemp() < 50) {
+            if(tempService.GetBoilerTemp() > 38.0 && hardwareState.GetPumpOnTime() > 40 * MINUTES && tempService.GetOutsideTemp() > 0.0) {
                 SetState(TH_STATE_DEFROST_PAUSE);
                 stateTime = 30 * MINUTES;
             }
@@ -297,7 +297,7 @@ void THDevice::Pause() {
 }
 
 void THDevice::Heat() {
-    if(tempService.GetBoilerTemp() > 42) {
+    if(tempService.GetBoilerTemp() > 40) {
         SetState(TH_STATE_PAUSE);
         return;
     }
@@ -313,7 +313,7 @@ void THDevice::HeatA() {
     stateTime = 16 * MINUTES;
     float currentTemp = tempService.GetTeTemp();
     float delta2 = currentTemp - tempService.GetBoilerTemp();
-    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && delta2 < 8.0 || currentTemp < 40.0) {
+    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && (delta2 < 8.0 || currentTemp < 40.0)) {
         SetState(TH_STATE_DEFROST);
     }
 }
@@ -326,7 +326,7 @@ void THDevice::HeatB() {
     float delta2 = currentTemp - tempService.GetBoilerTemp();
     previousTemp = currentTemp;
 
-    if(hardwareState.GetPumpOnTime() > 5 * MINUTES && delta > 1.0 && (delta2 < 3.0 || currentTemp < 40.0)) {
+    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && delta > 1.0 && (delta2 < 3.0 || currentTemp < 40.0)) {
         SetState(TH_STATE_DEFROST);
     }
 }
@@ -336,7 +336,7 @@ void THDevice::HeatC() {
     stateTime = 16 * MINUTES;
     float currentTemp = tempService.GetTeTemp();
     float delta2 = currentTemp - tempService.GetBoilerTemp();
-    if(hardwareState.GetPumpOnTime() > 5 * MINUTES && delta2 < 3.0 || currentTemp < 40.0) {
+    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && (delta2 < 3.0 || currentTemp < 40.0)) {
         SetState(TH_STATE_DEFROST);
     }
 }
