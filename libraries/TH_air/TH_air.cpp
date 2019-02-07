@@ -66,13 +66,9 @@ void THDevice::Error() {
     //Turn off all
     hardwareState.SetPumpOn(false);
     hardwareState.SetFanOn(false);
-    hardwareState.SetValveHeatOn(false);
 
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(1000);
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(500);
-    digitalWrite(LED_BUILTIN, LOW);
+    delay(2000);
+    hardwareState.SetValveHeatOn(false);
 
     nextState = TH_STATE_START;
     stateTime = 2 * MINUTES;
@@ -269,7 +265,7 @@ void THDevice::DefrostCool() {
 void THDevice::DefrostCoolHigh() {
     hardwareState.SetFanOn(false);
     hardwareState.SetValveHeatOn(false);
-    delay(1000);
+    delay(2000);
     hardwareState.SetPumpOn(true);
     nextState = TH_STATE_DEFROST_PAUSE;
     stateTime = 6 * MINUTES;
@@ -296,9 +292,10 @@ void THDevice::Defrost() {
 }
 
 void THDevice::Pause() {
-    hardwareState.SetValveHeatOn(false);
     hardwareState.SetFanOn(false);
     hardwareState.SetPumpOn(false);
+    delay(2000);
+    hardwareState.SetValveHeatOn(false);
 
     nextState = TH_STATE_PAUSE;
     stateTime = 10 * MINUTES;
@@ -311,6 +308,7 @@ void THDevice::Heat() {
     }
     previousTemp = tempService.GetTeTemp();
     hardwareState.SetValveHeatOn(true);
+    delay(2000);
 
     nextState = TH_STATE_HEAT;
     stateTime = 4 * MINUTES;
