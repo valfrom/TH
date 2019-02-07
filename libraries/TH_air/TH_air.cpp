@@ -328,7 +328,7 @@ void THDevice::HeatB() {
     nextState = TH_STATE_HEAT_B;
     stateTime = 16 * MINUTES;
     float currentTemp = tempService.GetTeTemp();
-    float delta = fabs(currentTemp - previousTemp);
+    float delta = previousTemp - currentTemp;
     float delta2 = currentTemp - tempService.GetBoilerTemp();
     previousTemp = currentTemp;
 
