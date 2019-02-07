@@ -6,7 +6,7 @@
 
 #define PUMP_PIN D1 //D1
 #define FAN_PIN D2 //D2
-#define VALVE_PIN D3 //D3
+#define VALVE_PIN D5 //D5
 
 #define ONE_WIRE_BUS D4  // DS18B20 on D4
 
