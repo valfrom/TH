@@ -236,6 +236,8 @@ void THDevice::UpdateHeat() {
             if(tempService.GetBoilerTemp() > 38.0 && hardwareState.GetPumpOnTime() > 40 * MINUTES && tempService.GetOutsideTemp() > 0.0) {
                 SetState(TH_STATE_DEFROST_PAUSE);
                 stateTime = 30 * MINUTES;
+            } else if(tempService.GetOutsideTemp() < 0 && hardwareState.GetPumpOnTime() > 120 * MINUTES) {
+                SetState(TH_STATE_DEFROST);
             }
             break;
     }
@@ -313,7 +315,7 @@ void THDevice::HeatA() {
     stateTime = 16 * MINUTES;
     float currentTemp = tempService.GetTeTemp();
     float delta2 = currentTemp - tempService.GetBoilerTemp();
-    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && (delta2 < 8.0 || currentTemp < 40.0)) {
+    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && hardwareState.GetFanOnTime() > 5 * MINUTES && (delta2 < 8.0 || currentTemp < 40.0)) {
         SetState(TH_STATE_DEFROST);
     }
 }
@@ -326,7 +328,7 @@ void THDevice::HeatB() {
     float delta2 = currentTemp - tempService.GetBoilerTemp();
     previousTemp = currentTemp;
 
-    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && delta > 1.0 && (delta2 < 3.0 || currentTemp < 40.0)) {
+    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && hardwareState.GetFanOnTime() > 5 * MINUTES  && delta > 1.0 && (delta2 < 3.0 || currentTemp < 40.0)) {
         SetState(TH_STATE_DEFROST);
     }
 }
@@ -336,7 +338,7 @@ void THDevice::HeatC() {
     stateTime = 16 * MINUTES;
     float currentTemp = tempService.GetTeTemp();
     float delta2 = currentTemp - tempService.GetBoilerTemp();
-    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && (delta2 < 3.0 || currentTemp < 40.0)) {
+    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && hardwareState.GetFanOnTime() > 5 * MINUTES  && (delta2 < 3.0 || currentTemp < 40.0)) {
         SetState(TH_STATE_DEFROST);
     }
 }
@@ -346,5 +348,5 @@ void THDevice::Start() {
     hardwareState.SetFanOn(false);
     hardwareState.SetValveHeatOn(false);
     nextState = TH_STATE_HEAT;
-    stateTime = 2 * MINUTES;
+    stateTime = 4 * MINUTES;
 }

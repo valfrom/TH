@@ -19,5 +19,5 @@ float THSensorServiceAir::GetTeTemp() {
     return temperatures[teTempIndex];
 }
 float THSensorServiceAir::GetBoilerTemp() {
-    return temperatures[boilerTempIndex] + 12;
+    return temperatures[boilerTempIndex] + 13;
 }

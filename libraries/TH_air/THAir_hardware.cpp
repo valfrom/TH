@@ -13,6 +13,9 @@ THHardwareState::THHardwareState() {
 void THHardwareState::SetFanOn(bool fanOn) {
     pinMode(FAN_PIN, fanOn?OUTPUT:INPUT_PULLUP);
     this->fanOn = fanOn;
+    if(!fanOn) {
+        fanOnTime = 0;
+    }
 }
 
 bool THHardwareState::IsFanOn() {
@@ -36,6 +39,13 @@ void THHardwareState::Update(long deltaTime) {
         pumpTotalOnTime += deltaTime;
         pumpOnTime += deltaTime;
     }
+    if(fanOn) {
+        fanOnTime += deltaTime;
+    }
+}
+
+long THHardwareState::GetFanOnTime() {
+    return fanOnTime;
 }
 
 long THHardwareState::GetPumpOnTime() {

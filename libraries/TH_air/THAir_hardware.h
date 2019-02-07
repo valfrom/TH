@@ -13,6 +13,7 @@ public:
     void SetPumpOn(bool pumpOn);
     bool IsPumpOn();
     long GetPumpOnTime();
+    long GetFanOnTime();
     long GetTotalPumpOnTime();
     void Update(long deltaTime);
 private:
@@ -21,6 +22,7 @@ private:
     bool pumpOn;
     bool mainRelayOn;
     long pumpOnTime;
+    long fanOnTime;
     long pumpTotalOnTime;
     long previousTimePumpOn;
 };
