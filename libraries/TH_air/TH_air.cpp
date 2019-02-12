@@ -225,13 +225,11 @@ void THDevice::UpdateHeat() {
                 SetState(TH_STATE_HEAT_A);
             }
             break;
-        case TH_STATE_HEAT_A:
-            if(tempService.GetOutsideTemp() < 10) {
-                if(hardwareState.GetPumpOnTime() > 80 * MINUTES && hardwareState.GetFanOnTime() > 20 * MINUTES) {
-                    SetState(TH_STATE_DEFROST);
-                }
-            }
-            break;
+    }
+    if(tempService.GetOutsideTemp() < 15) {
+        if(hardwareState.GetPumpOnTime() > 80 * MINUTES && hardwareState.GetFanOnTime() > 20 * MINUTES) {
+            SetState(TH_STATE_DEFROST);
+        }
     }
 }
 
