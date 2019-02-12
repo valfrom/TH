@@ -1,6 +1,7 @@
 #include <TH_conf.h>
 #include "THAir_temp.h"
 #include "THAir_hardware.h"
+#include "THAir_config.h"
 
 #ifndef TH_AIR_H
 #define TH_AIR_H
@@ -41,6 +42,7 @@ private:
 
     THHardwareState hardwareState;
     THSensorServiceAir tempService;
+    THAirConfig conf;
 };
 
 #endif //TH_AIR_H

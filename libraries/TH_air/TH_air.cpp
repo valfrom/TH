@@ -179,28 +179,25 @@ void THDevice::UpdateDefrostCool() {
 }
 
 void THDevice::UpdatePause() {
-    if(tempService.GetBoilerTemp() < 40.0) {
+    if(tempService.GetBoilerTemp() < conf.GetMinBoilerTemp()) {
         SetState(TH_STATE_START);
         return;
     }
 }
 
 void THDevice::UpdateHeat() {
-    if(tempService.GetBoilerTemp() > 40) {
+    if(tempService.GetBoilerTemp() > conf.GetMaxBoilerTemp()) {
         SetState(TH_STATE_PAUSE);
         return;
     }
-    float t1 = 50;
-    float t2 = 46;
-    float t3 = 56;
-    float t4 = 49;
 
-    if(tempService.GetBoilerTemp() > 38.0) {
-        t1 = 53;
-        t2 = 49;
-        t3 = 59;
-        t4 = 52;
-    }
+    // Delta must be at least 20
+    float d = max(0, 20 - (50 - tempService.GetBoilerTemp()));
+
+    float t1 = 50 + d;
+    float t2 = 46 + d;
+    float t3 = 56 + d;
+    float t4 = 49 + d;
 
     if(tempService.GetTeTemp() > t1 || !hardwareState.IsPumpOn()) {
         hardwareState.SetFanOn(false);
@@ -229,16 +226,8 @@ void THDevice::UpdateHeat() {
             }
             break;
         case TH_STATE_HEAT_A:
-            if(tempService.GetOutsideTemp() > 0) {
-                if(tempService.GetBoilerTemp() > 38.0 && hardwareState.GetPumpOnTime() > 40 * MINUTES) {
-                    SetState(TH_STATE_DEFROST_PAUSE);
-                    stateTime = 30 * MINUTES;
-                    if(tempService.GetOutsideTemp() < 3.0) {
-                        hardwareState.SetFanOn(true);
-                    }
-                }
-            } else {
-                if(hardwareState.GetPumpOnTime() > 120 * MINUTES) {
+            if(tempService.GetOutsideTemp() < 10) {
+                if(hardwareState.GetPumpOnTime() > 80 * MINUTES && hardwareState.GetFanOnTime() > 20 * MINUTES) {
                     SetState(TH_STATE_DEFROST);
                 }
             }
@@ -302,7 +291,7 @@ void THDevice::Pause() {
 }
 
 void THDevice::Heat() {
-    if(tempService.GetBoilerTemp() > 40) {
+    if(tempService.GetBoilerTemp() > conf.GetMaxBoilerTemp()) {
         SetState(TH_STATE_PAUSE);
         return;
     }
