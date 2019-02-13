@@ -4,12 +4,11 @@
 #define MINUTES (60 * SECONDS)
 #define HOURS (60 * MINUTES)
 
-#define MAIN_RELAY_PIN 16 //D0
-#define PUMP_PIN 5 //D1
-#define FAN_PIN 4 //D2
-#define VALVE_PIN 0 //D3
+#define PUMP_PIN D1 //D1
+#define FAN_PIN D2 //D2
+#define VALVE_PIN D5 //D5
 
-#define ONE_WIRE_BUS 2  // DS18B20 on D4
+#define ONE_WIRE_BUS D4  // DS18B20 on D4
 
 #define SERVER "api.thingspeak.com"
 
@@ -21,3 +20,7 @@
 #define TH_STATE_DEFROST_PAUSE 5
 #define TH_STATE_DEFROST_COOL 6
 #define TH_STATE_ERROR 7
+#define TH_STATE_HEAT_A 8
+#define TH_STATE_HEAT_B 9
+#define TH_STATE_HEAT_C 10
+#define TH_STATE_DEFROST_COOL_HIGH 11
