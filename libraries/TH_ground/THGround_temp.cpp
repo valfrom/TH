@@ -1,22 +1,18 @@
 #include "THGround_temp.h"
 
 THSensorServiceGround::THSensorServiceGround() : THSensorService() {
-    pumpTempIndex = 2;
-    outTempIndex = 4;
+    teLowTempIndex = 3;
+    outTempIndex = 1;
     inTempIndex = 0;
-    kegDownIndex = 1;
-    kegUpIndex = 3;
-    count = 5;
+    teHighTempIndex = 2;
+    count = 4;
 }
 
-float THSensorServiceGround::GetPumpTemp() {
-    return temperatures[pumpTempIndex];
+float THSensorServiceGround::GetTeLowTemp() {
+    return temperatures[teLowTempIndex];
 }
-float THSensorServiceGround::GetKegDownTemp() {
-    return temperatures[kegDownIndex];
-}
-float THSensorServiceGround::GetKegUpTemp() {
-    return temperatures[kegUpIndex];
+float THSensorServiceGround::GetTeHighTemp() {
+    return temperatures[teHighTempIndex];
 }
 float THSensorServiceGround::GetInTemp() {
     return temperatures[inTempIndex];
