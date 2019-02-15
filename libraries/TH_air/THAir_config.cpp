@@ -15,3 +15,7 @@ float THAirConfig::GetMaxBoilerTemp() {
 float THAirConfig::GetMinBoilerTemp() {
     return GetMaxBoilerTemp() - 1;
 }
+
+float THAirConfig::GetMaxPumpHeatTemp() {
+    return 60;
+}

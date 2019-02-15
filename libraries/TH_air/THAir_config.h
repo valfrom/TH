@@ -9,6 +9,7 @@ public:
     void SetMaxBoilerTemp(float temp);
     float GetMaxBoilerTemp();
     float GetMinBoilerTemp();
+    float GetMaxPumpHeatTemp();
 private:
     float maxBoilerTemp;
 };
