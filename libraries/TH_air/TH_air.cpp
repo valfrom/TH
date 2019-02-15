@@ -192,7 +192,7 @@ void THDevice::UpdateHeat() {
     }
 
     // Delta must be at least 20
-    float d = max(0, 20 - (50 - tempService.GetBoilerTemp()));
+    float d = max(0.0, 20.0 - (50.0 - tempService.GetBoilerTemp()));
 
     float t1 = 50 + d;
     float t2 = 46 + d;
