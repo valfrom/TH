@@ -10,6 +10,7 @@ public:
     float GetMaxBoilerTemp();
     float GetMinBoilerTemp();
     float GetMaxPumpHeatTemp();
+    float GetMaxPumpTeDiff();
 private:
     float maxBoilerTemp;
 };

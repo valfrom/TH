@@ -308,7 +308,7 @@ void THDevice::HeatA() {
     float delta2 = currentTemp - tempService.GetBoilerTemp();
 
     // Very likely we need to defrost
-    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && tempService.GetPumpTemp() > conf.GetMaxPumpHeatTemp()) {
+    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && tempService.GetPumpTemp() - tempService.GetTeTemp() > conf.GetMaxPumpTeDiff() && tempService.GetPumpTemp() > conf.GetMaxPumpHeatTemp()) {
         SetState(TH_STATE_DEFROST);
     }
 
@@ -327,7 +327,7 @@ void THDevice::HeatB() {
     previousTemp = currentTemp;
 
     // Very likely we need to defrost
-    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && tempService.GetPumpTemp() > conf.GetMaxPumpHeatTemp()) {
+    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && tempService.GetPumpTemp() - tempService.GetTeTemp() > conf.GetMaxPumpTeDiff() && tempService.GetPumpTemp() > conf.GetMaxPumpHeatTemp()) {
         SetState(TH_STATE_DEFROST);
     }
 
@@ -343,7 +343,7 @@ void THDevice::HeatC() {
     float delta2 = currentTemp - tempService.GetBoilerTemp();
     
     // Very likely we need to defrost
-    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && tempService.GetPumpTemp() > conf.GetMaxPumpHeatTemp()) {
+    if(hardwareState.GetPumpOnTime() > 16 * MINUTES && tempService.GetPumpTemp() - tempService.GetTeTemp() > conf.GetMaxPumpTeDiff() && tempService.GetPumpTemp() > conf.GetMaxPumpHeatTemp()) {
         SetState(TH_STATE_DEFROST);
     }
 
