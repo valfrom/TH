@@ -167,10 +167,14 @@ void THDevice::Error() {
 }
 
 void THDevice::Heat() {
+    if(tempService.GetInTemp() > 45.0) {
+        SetState(TH_STATE_PAUSE);
+        return;
+    }
     hardwareState.SetPumpOn(true);
 
     nextState = TH_STATE_DEFROST;
-    stateTime = 50 * MINUTES;
+    stateTime = 10 * MINUTES;
     return;
 }
 
