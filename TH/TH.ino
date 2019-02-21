@@ -9,11 +9,13 @@
 
 THDevice* device;
 
+volatile int currentTime = millis();
+
 void setup() {
     Serial.begin(115200);
 
     device = new THDevice();
-    
+
     Serial.println("Booting TH-wifi");
     delay(5000);
     WiFi.mode(WIFI_STA);
@@ -46,11 +48,13 @@ void setup() {
     ArduinoOTA.begin();
     Serial.println("Ready");
     Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());    
+    Serial.println(WiFi.localIP());
 }
 
 void loop() {
     ArduinoOTA.handle();
-    device->Update(1000 * 45 / 30);
+    int delta = millis() - currentTime;
+    currentTime = millis();
+    device->Update(delta);
     delay(1000);
 }
