@@ -14,8 +14,10 @@ public:
     bool IsPumpOn();
     long GetPumpOnTime();
     long GetFanOnTime();
+    long GetFanOffTime();
     long GetTotalPumpOnTime();
     void Update(long deltaTime);
+    void SetFanLockTime(long time);
 private:
     bool fanOn;
     bool valveHeatOn;
@@ -25,6 +27,8 @@ private:
     long fanOnTime;
     long pumpTotalOnTime;
     long previousTimePumpOn;
+
+    long fanLockTime;
 };
 
 #endif //TH_AIR_HARDWARE_H

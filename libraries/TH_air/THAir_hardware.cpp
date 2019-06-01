@@ -5,15 +5,22 @@ THHardwareState::THHardwareState() {
     previousTimePumpOn = 0;
     pumpTotalOnTime = 0;
     pumpOnTime = 0;
+    fanLockTime = 0;
+    fanOffTime = 0;
     SetPumpOn(false);
     SetFanOn(false);
     SetValveHeatOn(false);
 }
 
 void THHardwareState::SetFanOn(bool fanOn) {
+    if(fanLockTime > 0) {
+        return;
+    }
     pinMode(FAN_PIN, fanOn?OUTPUT:INPUT_PULLUP);
     this->fanOn = fanOn;
-    if(!fanOn) {
+    if(fanOn) {
+        fanOffTime = 0;
+    } else {
         fanOnTime = 0;
     }
 }
@@ -41,11 +48,24 @@ void THHardwareState::Update(long deltaTime) {
     }
     if(fanOn) {
         fanOnTime += deltaTime;
+    } else {
+        fanOffTime += deltaTime;
     }
+    if(fanLockTime > 0) {
+        fanLockTime -= deltaTime;
+    }
+}
+
+void THHardwareState::SetFanLockTime(long time) {
+    fanLockTime = deltaTime;
 }
 
 long THHardwareState::GetFanOnTime() {
     return fanOnTime;
+}
+
+long THHardwareState::GetFanOffTime() {
+    return fanOffTime;
 }
 
 long THHardwareState::GetPumpOnTime() {
