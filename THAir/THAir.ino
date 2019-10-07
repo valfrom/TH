@@ -12,11 +12,16 @@ THDevice* device;
 volatile int currentTime = millis();
 
 void setup() {
-    Serial.begin(115200);
+    Serial.begin(9600);
+
+    delay(1000);
+    
+    Serial.print("Version: ");
+    Serial.println(TH_VERSION);
+    Serial.println("Booting TH-wifi");
 
     device = new THDevice();
 
-    Serial.println("Booting TH-wifi");
     delay(5000);
     WiFi.mode(WIFI_STA);
     WiFi.begin(WIFI_SSID, WIFI_PASS);

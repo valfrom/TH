@@ -48,7 +48,8 @@ void THDevice::SendCurrentState(bool force) {
         values[4] = hardwareState.GetPumpOnTime();
         values[5] = float(stateTime);
         values[6] = float(currentState);
-        values[7] = (hardwareState.IsPumpOn()?1:0) + (hardwareState.IsFanOn()?10:0) + (hardwareState.IsValveHeatOn()?100:0);
+        values[7] = (hardwareState.IsPumpOn()?1:0) + (hardwareState.IsFanOn()?10:0) + (hardwareState.IsValveHeatOn()?100:0) + 
+                TH_VERSION * 1000;
         sendTeperatureTS(values, 8);
     }
 
@@ -199,7 +200,9 @@ void THDevice::UpdateHeat() {
     float t3 = 65 + d;
     float t4 = 49 + d;
 
-    if(tempService.GetTeTemp() > t1 || !hardwareState.IsPumpOn()) {
+    if(tempService.GetPumpTemp() > 60) {
+        hardwareState.SetFanOn(true);
+    } else if(tempService.GetTeTemp() > t1 || !hardwareState.IsPumpOn()) {
         hardwareState.SetFanOn(false);
     } else if(tempService.GetTeTemp() < t2 && hardwareState.GetPumpOnTime() > 5 * MINUTES) {
         hardwareState.SetFanOn(true);

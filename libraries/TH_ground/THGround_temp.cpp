@@ -6,6 +6,13 @@ THSensorServiceGround::THSensorServiceGround() : THSensorService() {
     inTempIndex = 0;
     teHighTempIndex = 2;
     count = 4;
+
+    #if DEBUG_BUILD
+        temperatures[teLowTempIndex] = 20;
+        temperatures[outTempIndex] = 21;
+        temperatures[inTempIndex] = 22;
+        temperatures[teHighTempIndex] = 23;
+    #endif
 }
 
 float THSensorServiceGround::GetTeLowTemp() {

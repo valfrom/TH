@@ -1,5 +1,7 @@
 #include "TH_private.h"
 
+#define DEBUG_BUILD 0
+
 #define SECONDS (1000)
 #define MINUTES (60 * SECONDS)
 #define HOURS (60 * MINUTES)
@@ -24,3 +26,5 @@
 #define TH_STATE_HEAT_B 9
 #define TH_STATE_HEAT_C 10
 #define TH_STATE_DEFROST_COOL_HIGH 11
+
+#define TH_VERSION 3
