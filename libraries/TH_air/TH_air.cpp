@@ -200,7 +200,7 @@ void THDevice::UpdateHeat() {
     float t3 = 65 + d;
     float t4 = 49 + d;
 
-    if(tempService.GetPumpTemp() > 60) {
+    if(tempService.GetPumpTemp() > 60 || tempService.GetTeTemp() < 60) {
         hardwareState.SetFanOn(true);
     } else if(tempService.GetTeTemp() > t1 || !hardwareState.IsPumpOn()) {
         hardwareState.SetFanOn(false);
