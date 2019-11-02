@@ -25,6 +25,7 @@ private:
     bool mainRelayOn;
     long pumpOnTime;
     long fanOnTime;
+    long fanOffTime;
     long pumpTotalOnTime;
     long previousTimePumpOn;
 
