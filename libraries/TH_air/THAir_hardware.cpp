@@ -57,7 +57,7 @@ void THHardwareState::Update(long deltaTime) {
 }
 
 void THHardwareState::SetFanLockTime(long time) {
-    fanLockTime = deltaTime;
+    fanLockTime = time;
 }
 
 long THHardwareState::GetFanOnTime() {
