@@ -249,6 +249,8 @@ void THDevice::Heat() {
     hardwareState.SetFanOn(true);
     delay(5000);
 
+    hardwareState.SetPumpOn(true);
+
     nextState = TH_STATE_HEAT;
     stateTime = 30 * MINUTES;
 }
