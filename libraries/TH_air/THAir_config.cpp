@@ -1,7 +1,7 @@
 #include "THAir_config.h"
 
 THAirConfig::THAirConfig() {
-    SetMaxBoilerTemp(45);
+    SetMaxBoilerTemp(40);
 }
 
 void THAirConfig::SetMaxBoilerTemp(float temp) {

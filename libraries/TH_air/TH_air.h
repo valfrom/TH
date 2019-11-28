@@ -23,9 +23,6 @@ private:
     void DefrostCoolHigh();
     void Defrost();
     void Heat();
-    void HeatA();
-    void HeatB();
-    void HeatC();
     void Start();
     void Pause();
 
