@@ -236,11 +236,6 @@ void THDevice::UpdateHeat() {
             }
             break;
     }
-    if(tempService.GetOutsideTemp() < 15) {
-        if(hardwareState.GetPumpOnTime() > 80 * MINUTES && hardwareState.GetFanOnTime() > 20 * MINUTES) {
-            SetState(TH_STATE_DEFROST);
-        }
-    }
 }
 
 void THDevice::DefrostPause() {
@@ -272,7 +267,7 @@ void THDevice::Defrost() {
     hardwareState.SetPumpOn(false);
     hardwareState.SetFanOn(false);
 
-    if(tempService.GetOutsideTemp() > 15.0) {
+    if(tempService.GetOutsideTemp() > 5.0) {
         stateTime = 15 * MINUTES;
         nextState = TH_STATE_HEAT;
         return;
