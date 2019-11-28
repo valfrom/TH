@@ -246,7 +246,8 @@ void THDevice::Heat() {
     }
     previousTemp = tempService.GetTeTemp();
     hardwareState.SetValveHeatOn(true);
-    delay(2000);
+    hardwareState.SetFanOn(true);
+    delay(5000);
 
     nextState = TH_STATE_HEAT;
     stateTime = 30 * MINUTES;
