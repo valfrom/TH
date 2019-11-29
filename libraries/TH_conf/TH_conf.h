@@ -27,4 +27,4 @@
 #define TH_STATE_HEAT_C 10
 #define TH_STATE_DEFROST_COOL_HIGH 11
 
-#define TH_VERSION 3
+#define TH_VERSION 4
