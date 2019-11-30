@@ -183,7 +183,7 @@ void THDevice::UpdateHeat() {
         return;
     }
 
-    if(hardwareState.GetPumpOnTime() > 30 * MINUTES && tempService.GetTeTemp() < 40) {
+    if(hardwareState.GetPumpOnTime() > 30 * MINUTES && tempService.GetTeTemp() < 35) {
         SetState(TH_STATE_DEFROST);
     }
 }
@@ -210,23 +210,24 @@ void THDevice::DefrostCoolHigh() {
     delay(2000);
     hardwareState.SetPumpOn(true);
     nextState = TH_STATE_DEFROST_PAUSE;
-    stateTime = 4 * MINUTES;
+    stateTime = 3 * MINUTES;
 }
 
 void THDevice::Defrost() {
     hardwareState.SetPumpOn(false);
-    hardwareState.SetFanOn(false);
 
     if(tempService.GetOutsideTemp() > 1.0) {
         SetState(TH_STATE_DEFROST_PAUSE);
         return;
     }
 
-    if(tempService.GetOutsideTemp() > -2.0) {
-        SetState(TH_STATE_DEFROST_COOL);
+    if(tempService.GetOutsideTemp() > -5.0) {
+        nextState = TH_STATE_DEFROST_COOL;
+        stateTime = 5 * MINUTES;
         return;
     }
-    SetState(TH_STATE_DEFROST_COOL_HIGH);
+    nextState = TH_STATE_DEFROST_COOL_HIGH;
+    stateTime = 5 * MINUTES;
 }
 
 void THDevice::Pause() {
