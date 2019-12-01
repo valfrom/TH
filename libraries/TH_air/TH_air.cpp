@@ -183,7 +183,16 @@ void THDevice::UpdateHeat() {
         return;
     }
 
-    if(hardwareState.GetPumpOnTime() > 30 * MINUTES && tempService.GetTeTemp() < 35) {
+    float tMin = 35 + tempService.GetOutsideTemp();
+    if(tMin < 25) {
+        tMin = 25;
+    }
+
+    if(tMin > 40) {
+        tMin = 40;
+    }
+
+    if(hardwareState.GetPumpOnTime() > 30 * MINUTES && tempService.GetTeTemp() < tMin) {
         SetState(TH_STATE_DEFROST);
     }
 }
