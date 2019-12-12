@@ -225,7 +225,7 @@ void THDevice::Defrost() {
 
     if(tempService.GetOutsideTemp() > -2.0) {
         nextState = TH_STATE_DEFROST_COOL;
-        stateTime = 3 * MINUTES;
+        stateTime = 5 * MINUTES;
         return;
     }
 
