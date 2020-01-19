@@ -244,7 +244,7 @@ void THDevice::Pause() {
 }
 
 void THDevice::Heat() {
-    if(tempService.GetOutsideTemp() < -5.0) {
+    if(tempService.GetOutsideTemp() < -1.0) {
         SetState(TH_STATE_PAUSE);
         return;
     }
